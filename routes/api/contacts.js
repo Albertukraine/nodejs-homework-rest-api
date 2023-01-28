@@ -29,23 +29,15 @@ router.get("/:contactId", async (req, res, next) => {
   try {
     const id = req.params.contactId;
     const contact = await getContactById(id);
+    if(!contact) {res.status(404).json({message: "Not found"})};
     res.status(200).json(contact);
   } catch (error) {
-    res.status(500).json({
-      status: "error",
-      code: 500,
-      message: "server error",
-    });
+    next(error);
   }
 });
 
 router.post("/", validateMiddleware, async (req, res, next) => {
   try {
-    const { error } = contactSchema.validate(req.body);
-    if (error) {
-      error.status = 400;
-      throw error;
-    }
     const result = await addContact(req.body);
     res.status(201).json(result);
   } catch (error) {
@@ -58,20 +50,12 @@ router.delete("/:contactId", async (req, res, next) => {
     const id = req.params.contactId;
     const result = await removeContact(id);
     if (!result) {
-      res.status(404).json({
-        status: "error",
-        code: 404,
-        message: `Not found contact with ${id}`,
-      });
+      res.status(404).json({message: `Not found contact with ${id}`});
       return;
     }
     res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({
-      status: "error",
-      code: 500,
-      message: "server error",
-    });
+    res.status(500).json({message: "server error"});
   }
 });
 
@@ -81,13 +65,10 @@ router.put("/:contactId", async (req, res, next) => {
 
     const updatedContact = await updateContact(id, req.body);
     if (!updatedContact) {
-      res.status(404).json(`Contact with ID ${id} doesn't exist`);
+      res.status(404).json({message: `Contact with ID ${id} doesn't exist`});
     }
-    res.status(200).json({
-      status: "succes",
-      code: 200,
-      data: updatedContact,
-    });
+    res.status(200).json(updatedContact
+    );
   } catch (error) {
     next(error);
   }

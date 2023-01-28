@@ -13,6 +13,7 @@ async function getContactById(contactId) {
   const data = await fs.readFile(contactsPath, "utf8");
   const contactList = JSON.parse(data);
   const [gottenContact] = contactList.filter((item) => item.id === contactId);
+  if (!gottenContact) {return null};
   return gottenContact;
 }
 
