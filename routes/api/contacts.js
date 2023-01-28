@@ -1,14 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const Joi = require("joi");
-const contactSchema = Joi.object({
-  name: Joi.string()
-  .min(3)
-  .max(30)
-  .required(),
-  email: Joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net', 'uk', 'ua'] } }),
-  phone: Joi.number().required(),
-});
+const {validation} = require("../../middlewares");
+const {contactSchema} = require("../../schemas");
+const validateMiddleware = validation(contactSchema);
+
 
 const {
   listContacts,
@@ -21,30 +16,31 @@ const {
 router.get("/", async (req, res, next) => {
   try {
     const contacts = await listContacts();
-    res.status(200).json({
-      status: "succes", 
-      code: 200,
-      data: {contacts}
-
-    });
-    
+    res.status(200).json(contacts);
   } catch (error) {
     res.status(500).json({
       status: "error",
       code: 500,
-      message: "server error"
-    })
+      message: "server error",
+    });
   }
- 
 });
 
 router.get("/:contactId", async (req, res, next) => {
-  const id = req.params.contactId;
-  const contact = await getContactById(id);
-  res.json(contact);
+  try {
+    const id = req.params.contactId;
+    const contact = await getContactById(id);
+    res.status(200).json(contact);
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      code: 500,
+      message: "server error",
+    });
+  }
 });
 
-router.post("/", async (req, res, next) => {
+router.post("/", validateMiddleware, async (req, res, next) => {
   try {
     const { error } = contactSchema.validate(req.body);
     if (error) {
@@ -52,13 +48,7 @@ router.post("/", async (req, res, next) => {
       throw error;
     }
     const result = await addContact(req.body);
-    res.status(201).json({
-      status: "succes",
-      code: 201,
-      data: {
-        result,
-      },
-    });
+    res.status(201).json(result);
   } catch (error) {
     next(error);
   }
@@ -67,57 +57,41 @@ router.post("/", async (req, res, next) => {
 router.delete("/:contactId", async (req, res, next) => {
   try {
     const id = req.params.contactId;
-    const result = await getContactById(id);
-    if (result.length < 1) { res.status(404).json({
-      status: "error",
-      code: 404,
-      message: `Not found contact with ${id}`
-    });
-  return}
-    
-  await removeContact(id);
-  res.status(200).json({ message: `Contact with id ${id} was deleted from contact list` });
+    const result = await removeContact(id);
+    if (!result) {
+      res.status(404).json({
+        status: "error",
+        code: 404,
+        message: `Not found contact with ${id}`,
+      });
+      return;
+    }
+    res.status(200).json(result);
   } catch (error) {
     res.status(500).json({
       status: "error",
       code: 500,
-      message: "server error"
-    })
+      message: "server error",
+    });
   }
-  
 });
 
 router.put("/:contactId", async (req, res, next) => {
   try {
-    const { error } = contactSchema.validate(req.body);
-    if (error) {
-      error.status = 400;
-      throw error;
-    };
     const id = req.params.contactId;
-    const result = await getContactById(id);
-    if (result.length < 1) { res.status(404).json({
-      status: "error",
-      code: 404,
-      message: `Not found contact with ${id}`
-    });
-  return};
 
-  await updateContact(id, req.body);
-  res.status(200).json({
-    status: "succes",
-    code: 200,
-    data: {
-      result,
-    },
-  });
-    
+    const updatedContact = await updateContact(id, req.body);
+    if (!updatedContact) {
+      res.status(404).json(`Contact with ID ${id} doesn't exist`);
+    }
+    res.status(200).json({
+      status: "succes",
+      code: 200,
+      data: updatedContact,
+    });
   } catch (error) {
     next(error);
-    
-    
   }
-  
 });
 
 module.exports = router;
