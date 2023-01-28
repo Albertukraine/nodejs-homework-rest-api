@@ -26,7 +26,6 @@ async function addContact(body) {
   return newContact;
 }
 
-
 async function removeContact(contactId) {
   const contactList = await listContacts();
   const indexOfContact = contactList.findIndex(
@@ -43,8 +42,13 @@ async function removeContact(contactId) {
 async function updateContact(contactId, body) {
   const contactList = await listContacts();
   let updatedContact;
-  const updatedArray = contactList.map( (contact)=>{
-if(contact.id===contactId){ updatedContact = {...contact, ...body}; return updatedContact } return contact} );
+  const updatedArray = contactList.map((contact) => {
+    if (contact.id === contactId) {
+      updatedContact = { ...contact, ...body };
+      return updatedContact;
+    }
+    return contact;
+  });
   await fs.writeFile(contactsPath, JSON.stringify(updatedArray), "utf8");
   return updatedContact;
 }

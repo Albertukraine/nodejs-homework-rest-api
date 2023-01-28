@@ -1,9 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const {validation} = require("../../middlewares");
-const {contactSchema} = require("../../schemas");
+const { validation } = require("../../middlewares");
+const { contactSchema } = require("../../schemas");
 const validateMiddleware = validation(contactSchema);
-
 
 const {
   listContacts,
