@@ -6,7 +6,8 @@ const mongoose = require('mongoose')
 const DB_HOST = 'mongodb+srv://albertuser:FS47Rr7l2f8x2arI@cluster0.kem6fku.mongodb.net/db-contacts?retryWrites=true&w=majority'
 
 mongoose.connect(DB_HOST)
-.then(() => console.log('Database connection successful'))
+.then(() => {
+  console.log('Database connection successful')})
 .catch(error => {
   console.log(error.message);
   process.exit(1)
@@ -15,6 +16,8 @@ mongoose.connect(DB_HOST)
 const contactsRouter = require('./routes/api/contacts')
 
 const app = express()
+
+
 
 const formatsLogger = app.get('env') === 'development' ? 'dev' : 'short'
 
