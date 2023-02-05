@@ -10,7 +10,7 @@ const {
   removeContact,
   addContact,
   updateContact,
-} = require("../../models/contacts.js");
+} = require("../../controllers/contacts.js");
 
 router.get("/", async (req, res, next) => {
   try {

@@ -1,32 +1,31 @@
 const fs = require("fs").promises;
 const { log, Console } = require("console");
 const path = require("path");
-const contactsPath = path.resolve("./models/contacts.json");
+const contactsPath = path.resolve("./controllers/contacts.json");
 const { v4: uuidv4 } = require("uuid");
 
-async function listContacts() {
-  const data = await fs.readFile(contactsPath, "utf8");
-  return JSON.parse(data);
+const Contact = require('../models/contact');
+
+async function listContacts(req, res) {
+  const data = await Contact.find({});
+  return data;
 }
 
 async function getContactById(contactId) {
-  const data = await fs.readFile(contactsPath, "utf8");
-  const contactList = JSON.parse(data);
-  const [gottenContact] = contactList.filter((item) => item.id === contactId);
-  if (!gottenContact) {
-    return null;
-  }
-  return gottenContact;
+  const data = await Contact.find({_id: contactId});
+  return data;
 }
 
 async function addContact(body) {
-  const contactList = await listContacts();
-  const id = uuidv4();
-  const { name, email, phone } = body;
-  const newContact = { id, name, email, phone };
-  await contactList.push(newContact);
-  await fs.writeFile(contactsPath, JSON.stringify(contactList), "utf8");
-  return newContact;
+const data = await Contact.insert(body);
+
+  // const contactList = await listContacts();
+  // const id = uuidv4();
+  // const { name, email, phone } = body;
+  // const newContact = { id, name, email, phone };
+  // await contactList.push(newContact);
+  // await fs.writeFile(contactsPath, JSON.stringify(contactList), "utf8");
+  return data;
 }
 
 async function removeContact(contactId) {
