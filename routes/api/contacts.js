@@ -10,6 +10,7 @@ const {
   removeContact,
   addContact,
   updateContact,
+  updateStatusContact,
 } = require("../../controllers/contacts.js");
 
 router.get("/", async (req, res, next) => {
@@ -64,11 +65,28 @@ router.delete("/:contactId", async (req, res, next) => {
 router.put("/:contactId", async (req, res, next) => {
   try {
     const id = req.params.contactId;
-
     const updatedContact = await updateContact(id, req.body);
     if (!updatedContact) {
       res.status(404).json({ message: `Contact with ID ${id} doesn't exist` });
     }
+    res.status(200).json(updatedContact);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.patch("/:contactId", async (req, res, next)=> {
+  try {
+    const id = req.params.contactId;
+    const updatedContact = await updateStatusContact(id, req.body);
+    const {favorite} = req.body;
+    console.log("FAVORITE VALUE",favorite);
+    if(!updatedContact){
+      res.status(404).json({ message: `Contact with ID ${id} doesn't exist` });
+    };
+    if (favorite === undefined) {
+      res.status(400).json({ message: `missing field favorite` });
+    };
     res.status(200).json(updatedContact);
   } catch (error) {
     next(error);
