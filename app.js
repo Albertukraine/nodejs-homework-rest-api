@@ -1,6 +1,6 @@
-const express = require('express')
-const logger = require('morgan')
-const cors = require('cors')
+const express = require("express");
+const logger = require("morgan");
+const cors = require("cors");
 const mongoose = require('mongoose')
  
 const DB_HOST = 'mongodb+srv://albertuser:FS47Rr7l2f8x2arI@cluster0.kem6fku.mongodb.net/db-contacts?retryWrites=true&w=majority'
