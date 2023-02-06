@@ -8,8 +8,7 @@ const contactSchema = Joi.object({
     })
     .required(),
   phone: Joi.number().required(),
-  // favorite: Joi.boolean(),
-
+  favorite: Joi.boolean(),
 });
 
 module.exports = contactSchema;

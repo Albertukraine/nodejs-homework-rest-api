@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const { validation } = require("../../middlewares");
-const { contactSchema } = require("../../schemas");
-const validateMiddleware = validation(contactSchema);
+const { contactSchema, statusSchema } = require("../../schemas");
+
 
 const {
   listContacts,
@@ -39,7 +39,7 @@ router.get("/:contactId", async (req, res, next) => {
   }
 });
 
-router.post("/", validateMiddleware, async (req, res, next) => {
+router.post("/", validation(contactSchema), async (req, res, next) => {
   try {
     const result = await addContact(req.body);
     res.status(201).json(result);
@@ -75,18 +75,13 @@ router.put("/:contactId", async (req, res, next) => {
   }
 });
 
-router.patch("/:contactId", async (req, res, next)=> {
+router.patch("/:contactId", validation(statusSchema), async (req, res, next) => {
   try {
     const id = req.params.contactId;
     const updatedContact = await updateStatusContact(id, req.body);
-    const {favorite} = req.body;
-    console.log("FAVORITE VALUE",favorite);
-    if(!updatedContact){
+    if (!updatedContact) {
       res.status(404).json({ message: `Contact with ID ${id} doesn't exist` });
-    };
-    if (favorite === undefined) {
-      res.status(400).json({ message: `missing field favorite` });
-    };
+    }
     res.status(200).json(updatedContact);
   } catch (error) {
     next(error);
