@@ -75,7 +75,7 @@ router.put("/:contactId", async (req, res, next) => {
   }
 });
 
-router.patch("/:contactId", validation(statusSchema), async (req, res, next) => {
+router.patch("/:contactId/favorite", validation(statusSchema), async (req, res, next) => {
   try {
     const id = req.params.contactId;
     const updatedContact = await updateStatusContact(id, req.body);
