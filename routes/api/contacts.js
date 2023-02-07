@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const { validation } = require("../../middlewares");
-const { contactSchema } = require("../../schemas");
-const validateMiddleware = validation(contactSchema);
+const { contactSchema, statusSchema } = require("../../schemas");
+
 
 const {
   listContacts,
@@ -10,7 +10,8 @@ const {
   removeContact,
   addContact,
   updateContact,
-} = require("../../models/contacts.js");
+  updateStatusContact,
+} = require("../../controllers/contacts.js");
 
 router.get("/", async (req, res, next) => {
   try {
@@ -38,7 +39,7 @@ router.get("/:contactId", async (req, res, next) => {
   }
 });
 
-router.post("/", validateMiddleware, async (req, res, next) => {
+router.post("/", validation(contactSchema), async (req, res, next) => {
   try {
     const result = await addContact(req.body);
     res.status(201).json(result);
@@ -64,8 +65,20 @@ router.delete("/:contactId", async (req, res, next) => {
 router.put("/:contactId", async (req, res, next) => {
   try {
     const id = req.params.contactId;
-
     const updatedContact = await updateContact(id, req.body);
+    if (!updatedContact) {
+      res.status(404).json({ message: `Contact with ID ${id} doesn't exist` });
+    }
+    res.status(200).json(updatedContact);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.patch("/:contactId/favorite", validation(statusSchema), async (req, res, next) => {
+  try {
+    const id = req.params.contactId;
+    const updatedContact = await updateStatusContact(id, req.body);
     if (!updatedContact) {
       res.status(404).json({ message: `Contact with ID ${id} doesn't exist` });
     }
