@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { validation } = require("../../middlewares");
 const { contactSchema, statusSchema } = require("../../schemas");
-const errorHandler = require('../../helpers/index');
+// const {errorHandler} = require('../../helpers/index');
 
 
 const {
@@ -27,7 +27,8 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-router.get("/:contactId", async (req, res, next) => {
+router.get("/:contactId", 
+async (req, res, next) => {
   try {
     const id = req.params.contactId;
     const contact = await getContactById(id);
@@ -38,7 +39,8 @@ router.get("/:contactId", async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-});
+}
+);
 
 router.post("/", validation(contactSchema), async (req, res, next) => {
   try {
