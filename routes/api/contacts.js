@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { validation } = require("../../middlewares");
 const { contactSchema, statusSchema } = require("../../schemas");
+const errorHandler = require('../../helpers/index');
 
 
 const {
@@ -11,7 +12,7 @@ const {
   addContact,
   updateContact,
   updateStatusContact,
-} = require("../../controllers/contacts.js");
+} = require("../../controllers/contacts/index");
 
 router.get("/", async (req, res, next) => {
   try {
