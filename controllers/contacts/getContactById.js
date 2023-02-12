@@ -1,8 +1,16 @@
 const Contact = require("../../models/contact");
 
-async function getContactById(contactId) {
-    const data = await Contact.find({ _id: contactId });
-    return data;
-  };
+const { NotFound } = require("http-errors");
 
-  module.exports = getContactById;
+const getContactById = async (req, res) => {
+  const { id } = req.params;
+  const contact = await Contact.findById(id);
+
+  if (!contact) {
+    throw new NotFound(`Contact with id=${id} not found`);
+  }
+
+  res.status(200).json(contact);
+};
+
+module.exports = getContactById;
