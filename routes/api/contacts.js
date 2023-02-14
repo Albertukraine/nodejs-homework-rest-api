@@ -13,7 +13,7 @@ const {
   updateStatusContact,
 } = require("../../controllers/contacts/index");
 
-router.get("/", errorHandler(listContacts));
+router.get("/", auth, errorHandler(listContacts));
 
 router.get("/:contactId", errorHandler(getContactById));
 
