@@ -1,16 +1,13 @@
-// const { Conflict } = require("http-errors");
 const User = require("../../models/user");
+const {Conflict} = require('http-errors');
+const bcrypt = require('bcrypt');
 
 const register = async (req, res) => {
-  console.log("REGISTER CONTROLLER HERE");
   const { name, email, password } = req.body;
   const user = await User.findOne({ email });
-  // if(user) { throw new Conflict(`User with ${email} is already exist`)};
-  if (user) {
-    res.status(409).json({ message: "Email in use" });
-  }
+  const hashPass = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
   if (!user) {
-    await User.create({ name, email, password });
+    await User.create({ name, email, password: hashPass });
     res.status(201).json({
       status: "success",
       message: "user registered",
@@ -22,7 +19,9 @@ const register = async (req, res) => {
         },
       },
     });
+  } else {
+    throw new Conflict("Email in use");
   }
 };
 
-module.exports = { register };
+module.exports = register;

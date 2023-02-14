@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const { validation } = require("../../middlewares");
+const { auth, validation } = require("../../middlewares");
 const { contactSchema, statusSchema } = require("../../schemas");
-const errorHandler = require('../../helpers/index');
+const errorHandler = require("../../helpers/index");
 
 const {
   listContacts,
@@ -15,16 +15,18 @@ const {
 
 router.get("/", errorHandler(listContacts));
 
-router.get("/:contactId", errorHandler(getContactById)
+router.get("/:contactId", errorHandler(getContactById));
 
-);
-
-router.post("/", validation(contactSchema), errorHandler(addContact));
+router.post("/", auth, validation(contactSchema), errorHandler(addContact));
 
 router.delete("/:contactId", errorHandler(removeContact));
 
 router.put("/:contactId", errorHandler(updateContact));
 
-router.patch("/:contactId/favorite", validation(statusSchema), errorHandler(updateStatusContact));
+router.patch(
+  "/:contactId/favorite",
+  validation(statusSchema),
+  errorHandler(updateStatusContact)
+);
 
 module.exports = router;
