@@ -3,6 +3,7 @@ const {NotFound} = require('http-errors');
 
 
 const getContactById = async (req, res) => {
+  
   const { contactId } = req.params;
   const contact = await Contact.findById(contactId);
 

@@ -4,6 +4,7 @@ const { auth, validation } = require("../../middlewares");
 const { contactSchema, statusSchema } = require("../../schemas");
 const errorHandler = require("../../helpers/index");
 
+
 const {
   listContacts,
   getContactById,
@@ -15,13 +16,13 @@ const {
 
 router.get("/", auth, errorHandler(listContacts));
 
-router.get("/:contactId", errorHandler(getContactById));
+router.get("/:contactId", auth, errorHandler(getContactById));
 
 router.post("/", auth, validation(contactSchema), errorHandler(addContact));
 
-router.delete("/:contactId", errorHandler(removeContact));
+router.delete("/:contactId", auth, errorHandler(removeContact));
 
-router.put("/:contactId", errorHandler(updateContact));
+router.put("/:contactId", auth, errorHandler(updateContact));
 
 router.patch(
   "/:contactId/favorite",
