@@ -2,6 +2,7 @@ const User = require("../../models/user");
 const path = require("path");
 const fs = require("fs/promises");
 const jimp = require("jimp");
+const { PORT } = process.env;
 
 const avatarsDir = path.join(__dirname, "../../", "public", "avatars");
 
@@ -15,7 +16,7 @@ const updateAvatar = async (req, res) => {
 
     const resultUpload = path.join(avatarsDir, avatarName);
     await fs.rename(tempUpload, resultUpload);
-    const avatarURL = path.join("public", "avatars", avatarName);
+    const avatarURL = `http://localhost:${PORT}/avatars/${avatarName}`;
     await User.findByIdAndUpdate(req.user._id, { avatarURL });
     res.json({ avatarURL });
   } catch (error) {
