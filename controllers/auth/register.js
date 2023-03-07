@@ -17,8 +17,8 @@ const register = async (req, res) => {
     const verificationToken = uuidv4();
     const mail = {
       to: email,
-      subject: "Подтвердите регистрацию",
-      html: `<a target="_blank" href="http://localhost:${PORT}/api/users/verify/${verificationToken}" >Подтвердите Емейл</a>`,
+      subject: "Please confirm your email",
+      html: `<a target="_blank" href="http://localhost:${PORT}/api/users/verify/${verificationToken}" >Confirm email please</a>`,
     };
     
     await User.create({

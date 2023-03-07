@@ -7,13 +7,10 @@ const sendMail = async (data) => {
  
   try {
     const emailToSend = { ...data, from: "albertukraine@gmail.com" };
-    console.log("try to send mail");
     await sgMail.send(emailToSend);
-    console.log(emailToSend);
-    console.log("Email sent");
     return true;
   } catch (error) {
-    console.error(error);
+   
     if (error.response) {
       console.error(error.response.body);
     }
