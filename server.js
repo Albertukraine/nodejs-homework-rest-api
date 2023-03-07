@@ -2,6 +2,11 @@ const app = require("./app");
 const { connectDatabase } = require("../nodejs-homework-rest-api/db/connectDatabase")
 const { PORT } = process.env;
 
+
+
+
+
+
 const start = async () => {
   try {
     await connectDatabase();

@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { auth, validation } = require("../../middlewares");
 const { contactSchema, statusSchema } = require("../../schemas");
-const errorHandler = require("../../helpers/index");
+const {errorHandler} = require("../../helpers/index");
 
 const {
   listContacts,

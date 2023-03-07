@@ -1,7 +1,11 @@
 const User = require("../../models/user");
-const {Conflict} = require('http-errors');
-const bcrypt = require('bcrypt');
-const gravatar = require('gravatar');
+const { Conflict } = require("http-errors");
+const bcrypt = require("bcrypt");
+const gravatar = require("gravatar");
+const { v4: uuidv4 } = require("uuid");
+
+const { sendMail } = require("../../helpers/index");
+const { PORT } = process.env;
 
 const register = async (req, res) => {
   const { name, email, password } = req.body;
@@ -9,7 +13,22 @@ const register = async (req, res) => {
   const hashPass = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
   if (!user) {
     const avatarURL = gravatar.url(email);
-    await User.create({ name, email, avatarURL, password: hashPass });
+
+    const verificationToken = uuidv4();
+    const mail = {
+      to: email,
+      subject: "Подтвердите регистрацию",
+      html: `<a target="_blank" href="http://localhost:${PORT}/api/users/verify/${verificationToken}" >Подтвердите Емейл</a>`,
+    };
+    
+    await User.create({
+      name,
+      email,
+      avatarURL,
+      verificationToken,
+      password: hashPass,
+    });
+    await sendMail(mail);
     res.status(201).json({
       status: "success",
       message: "user registered",
@@ -18,6 +37,7 @@ const register = async (req, res) => {
         user: {
           email,
           avatarURL,
+          verificationToken,
         },
       },
     });
