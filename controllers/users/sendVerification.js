@@ -2,37 +2,36 @@ const User = require("../../models/user");
 const { BadRequest } = require("http-errors");
 const { sendMail } = require("../../helpers");
 const { PORT } = process.env;
+const { v4: uuidv4 } = require("uuid");
 
 const sendVerification = async (req, res) => {
   const { email } = req.body;
-  const { verificationToken } = req.params;
-
-  const userWithEmail = await User.findOne({
+  // шукаємо юзера по емейлу
+  const user = await User.findOne({
     email,
   });
-
-  if (!userWithEmail) {
-    throw BadRequest("Can`t find user with this email");
+  // юзера не існує
+  if (!user) {
+    throw BadRequest("Can`t find user with this email, please register");
   }
-
-  const userWithToken = await User.findByIdAndUpdate(
-    userWithEmail,
-    verificationToken
-  );
-
-  if (!userWithToken.verificationToken) {
-    throw BadRequest("Verification has already been passed");
+  // юзер є і він верифікований
+  if (user.verify) {
+    res.json({ message: ` ${email} already verificated` });
   }
-
-  await sendMail({
-    to: email,
-    subject: "Please confirm your email",
-    html: `<a target="_blank" href="http://localhost:${PORT}/api/users/verify/${verificationToken}" >Confirm email please</a>`,
-  });
-
-  res.status(201).json({
-    message: "Verification email sent",
-  });
+  // юзер є але невирифікований - генеруємо токен, записуємо в юзера веріфай тру, відправляємо лист з посиланням для верифікаціі
+  if (!user.verify) {
+    const verificationToken = uuidv4();
+    await User.findOneAndUpdate(email, { verificationToken });
+    const mail = {
+      to: email,
+      subject: "Please confirm your email",
+      html: `<a target="_blank" href="http://localhost:${PORT}/api/users/verify/${verificationToken}" >Confirm email please</a>`,
+    };
+    await sendMail(mail);
+    res.status(201).json({
+      message: "Please check your email, we send email for verification",
+    });
+  }
 };
 
 module.exports = sendVerification;
