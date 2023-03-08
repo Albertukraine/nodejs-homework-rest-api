@@ -19,4 +19,15 @@ const userLoginSchema = Joi.object({
   password: Joi.string().required(),
 });
 
-module.exports = { userRegisterSchema, userLoginSchema };
+const userSendMailSchema = Joi.object({
+  email: Joi.string()
+    .email({
+      minDomainSegments: 2,
+      tlds: { allow: ["com", "net", "uk", "ua"] },
+    })
+    .required()
+});
+
+
+
+module.exports = { userRegisterSchema, userLoginSchema, userSendMailSchema };
